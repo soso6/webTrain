@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+        
+        .active {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .iserr {
+            border: solid 1px rgba(255, 0, 0, 0.933);
+        }
+        
+        .base {
+            background-color: rebeccapurple;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="v-cloak">{{msg}}</div>
+        <div v-text="msg"></div>
+        <div v-html="msg1"></div>
+        <!-- 显示原始信息，跳过编译过程 -->
+        <div v-pre>{{msg}}</div>
+
+        <div v-once>{{info}}</div>
+        <!-- 数据的双向绑定 -->
+        <input type="text" v-model="uvalue">
+        <!-- 事件的绑定  -->
+        <div v-text="num"></div>
+        <button v-on:click='handle'>点击</button>
+        <button @click="handle2(1111,22222,$event)">点击1</button>
+        <!-- 4、事件修饰符 -->
+        <!-- 阻止冒泡  stop-->
+        <div v-on:click="handle3">
+            <button @click.stop="handle4">点击4</button>
+        </div>
+        <!-- 阻止默认行为prevent -->
+        <a @click.prevent="handle4">跳转</a>
+        <!-- 5、按键修饰符 -->
+        <!-- 回车键 -->
+        <input v-on:keyup.enter="submit">
+        <!-- 删除键 -->
+        <input v-on:keyup.delete="handle">
+        <input v-on:keyup.aaa="submit">
+        <!-- 6、自定义按键修饰符 -->
+
+
+        <!-- 计算机功能 -->
+
+        <div><span>请输入数值：</span><input v-model="a"></div>
+        <div><span>请输入数值：</span><input v-model="b"></div>
+        <button v-on:click='evalue'>计算</button>
+        <div><span>最终结果：</span><span v-text="result"></span></div>
+
+        <!-- 属性的绑定v-bind  可以使得属性的值与变量进行绑定动态变化-->
+        <a v-bind:href="url">百度</a>
+        <!-- 缩写的方式 -->
+        <a :href="url">测试1</a>
+        <!-- v-model 底层分析 -->
+
+        <div>{{msg}}</div>
+        <input type="text" v-bind:value="msg" v-on:input='inputHandle'>
+
+        <input type="text" v-bind:value="msg" v-on:input='msg=$event.target.value'>
+        <input type="text" v-model="msg">
+
+        <!-- 3.6 样式的绑定 -->
+        <!-- 对象的语法 -->
+        <!-- 以对象的形式，进行键值对的绑定   如果有多个属性，则直接使用多个键值对 -->
+        <div v-bind:class="{active: isActive, iserr:isActive}">dsdsadasda</div>
+        <button v-on:click="changeHandle">切换</button>
+
+        <!-- 数组的语法  在data中定义相应的key对应类名 -->
+
+        <div v-bind:class="[activeClass, errorClass]">ssadas</div>
+        <button v-on:click="classHandle">切换左右</button>
+
+        <!-- 可以混合使用 -->
+        <div v-bind:class="arrayClass">混合使用3</div>
+        <!-- 默认自带的class会保留 -->
+        <div class="base" v-bind:class="objClass">混合使用4</div>
+
+        <!-- 行内标签样式 -->
+        <div v-bind:style='{border: boderStyle,width: widthStyle,height: heightStyle}'></div>
+        <!-- 对象方式 -->
+        <div v-bind:style="objStyle"></div>
+
+        <!-- 数组方式【对象1，对象2】 -->
+        <div v-bind:style="[objStyle,overriderStyle]"></div>
+
+        <!-- 3.7 分支循环结构 -->
+        <!--
+            v-if
+            v-else 
+            v-else-if
+            v-show  
+        -->
+        <!-- v-if控制元素是否渲染到页面 控制dom元素的添加和删除 性能较大 -->
+        <div v-if="score>90">优秀</div>
+        <div v-else-if="score <=90 && score>80">良好</div>
+        <div v-else="score<=80">一般</div>
+        <!-- 控制样式是否显示 -->
+        <div v-show="flag">v-show测试</div>
+        <!-- 3.7 循环结构for -->
+
+        <div>
+            <ul>
+                <li v-for="item in fruits">{{item.ename+'----'+item.cname}}</li>
+                <!-- index是索引值 -->
+                <li :class='index==currentIndex? "active":" "' v-for=" (item,index) in fruits ">{{item.ename+'----'+item.cname+'----'+index}}</li>
+                <!-- 加上key是为了 帮助vue区分不同的元素，提高for的性能 -->
+                <li :key="index " v-for="(item,index) in fruits ">{{item.ename+'----'+item.cname}}</li>
+            </ul>
+        </div>
+        <!-- v-for 遍历对象 -->
+        <div v-for="(v,k,index) in objArr ">{{v+'----'+k+'-----'+index}}</div>
+        <!-- v-for结合if进行操作 -->
+        <!-- 只有满足条件的才会进行渲染 -->
+        <div v-if="v==12 " v-for="(v,k,index) in objArr ">{{v+'----'+k+'-----'+index}}</div>
+        <!-- 表单数据交互 -->
+
+        <form action="">
+            <div>
+                <span>姓名：</span>
+                <span><input type="text" v-model="uname"> </span>
+            </div>
+            <div><span>性别：</span>
+
+                <span>
+
+
+                <input type="radio" name="" id="male" value="1" v-model="gender">
+                <label for="male">男</label>
+
+                <input type="radio" name="" id="female" value="2" v-model="gender">
+                <label for="female">女</label>
+            </span>
+            </div>
+            <div>
+
+                <span>爱好：</span>
+                <input type="checkbox" name="" id="ball" value="0" v-model='hobby'>
+                <label for="ball">篮球</label>
+                <input type="checkbox" id="sing" value="1" v-model="hobby">
+                <label for="sing">唱歌</label>
+                <input type="checkbox" id="code" value="2" v-model="hobby">
+                <label for="code">写代码</label>
+            </div>
+
+            <div>
+                <span>职业：</span>
+
+                <select name="" id="" v-model="occupation" multiple="true">
+                    <option value="0">请选择职业...</option>
+                    <option value="1">教师</option>
+                    <option value="2">软件工程师</option>
+                    <option value="3">律师</option>
+
+                </select>
+            </div>
+            <div>
+                <span>个人简历</span>
+                <textarea v-model="mainVal"></textarea>
+            </div>
+            <div>
+
+                <input type="submit" value="提交" @click.prevent="subHandle">
+            </div>
+        </form>
+
+
+
+
+
+    </div>
+
+    <script src="./js/vue.js "></script>
+    <script type="text/javascript ">
+        /****
+         * 一、指令
+         * 1、v-cloak使用  解决闪动的问题
+         *（1） 提供一个样式
+         *[v-cloak]{
+         *    display:none;
+         *}
+         * 
+         * （2）在差值表达式所在的标签中添加v-cloak指令
+         *2、 v-text 填充纯文本
+         * 比差值表达式更加的简洁，不存在闪动问题
+         * 
+         * 3、v-html 直接填充html，不安全会被攻击，如果是来自外网的数据
+         * 
+         * 4、v-pre 显示原始的信息，跳过编译过程
+         * 
+         * 
+         * 5、数据的响应式
+         * 7、数据的绑定   数据-》页面
+         * 6、v-once 只编译一次
+         * 7、数据的双向绑定 使用到v-model这个指令
+         * 
+         * 8、mvvm 模型，view 通过vm（dom事件的监听来影响数据）到model，model层到view是通过数据的绑定
+         * 
+         * 二、事件绑定
+         * 
+         * v-on:click='num++' 简写模式 @click='num++'
+         * 
+         * 
+         * 事件的参数传递
+         * 
+         * 如果事件直接绑定事件名称没有参数，类似1那么调用的函数默认会存在一个event参数
+         * 如果事件绑定函数调用，那么事件对象必须作为最后一个参数显示的传递，并且一定是$event
+         *  */
+
+        //  自定义设置按键修饰符
+
+        /*****
+         * 值对应的是按键所对应得值
+         * aaa是自定义的按键修饰名字
+         * 
+         */
+        Vue.config.keyCodes.aaa = 112
+
+        var vm = new Vue({
+
+            el: '#app',
+            data: {
+                msg: 'hollwsssss',
+                msg1: '<h1>dasdas</h1>',
+                info: 'dsada',
+                uvalue: 'dasdaseeee',
+                num: 0,
+                a: 0,
+                b: 0,
+                result: 0,
+                url: 'http://wwww.baidu.com',
+                isActive: true,
+                activeClass: 'active',
+                errorClass: 'iserr',
+                arrayClass: ['active', 'iserr'],
+                objClass: {
+                    active: true,
+                    iserr: true,
+                },
+                boderStyle: '1px solid red',
+                widthStyle: '100px',
+                heightStyle: '200px',
+                objStyle: {
+                    border: '1px solid blue',
+                    width: '100px',
+                    height: '200px',
+                },
+                overriderStyle: {
+                    backgroundColor: 'rebeccapurple',
+                    border: '5px solid red',
+                },
+                score: 90,
+                flag: false,
+                fruits: [{
+                    cname: '苹果',
+                    ename: 'apple',
+                }, {
+                    cname: '苹果11',
+                    ename: 'apple11',
+                }, {
+                    cname: '苹果22',
+                    ename: 'apple22',
+                }, ],
+                objArr: {
+                    name: 'lx',
+                    age: 12,
+                    sex: 'nam'
+                },
+                currentIndex: 0,
+                uname: 'lx',
+                gender: 1,
+                hobby: ['1', '2'],
+                occupation: [1, 2],
+                mainVal: 'dasdasdasd'
+
+            },
+            methods: { // 函数处理都可以定义在这里面
+
+                handle: function(event) {
+                    this.num++ // this 是vm的实例
+                },
+                handle2: function(p, p1, event) {
+                    console.log("数据： " + p + p1 + event.target.innerHTML)
+                    this.num++
+                },
+                handle3: function() {
+                    console.log('输出父亲')
+                },
+                handle4: function() {
+                    console.log('孩子')
+                },
+                submit: function() {
+
+                    console.log('提交按钮')
+                },
+                evalue: function() {
+                    this.result = parseInt(this.a) + parseInt(this.b)
+                },
+                inputHandle: function(event) {
+                    console.log("大萨达撒大所多撒 ")
+                    this.msg = event.target.value
+
+                },
+                changeHandle: function() {
+
+                    this.isActive = !this.isActive
+                },
+                classHandle: function() {
+
+                    this.activeClass = ''
+                },
+                subHandle: function() {
+
+
+                    console.log(this.gender)
+                },
+
+            }
+
+        })
+
+
+        // 指令
+    </script>
+</body>
+
+</html>
